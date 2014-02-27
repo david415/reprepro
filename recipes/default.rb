@@ -22,7 +22,10 @@ include_recipe "build-essential"
 
 unless node['reprepro']['disable_databag']
   begin
-    apt_repo = data_bag_item("reprepro", "main")
+
+    shared_secret = Chef::EncryptedDataBagItem.load_secret('/etc/chef/encrypted_data_bag_secret')
+    apt_repo      = Chef::EncryptedDataBagItem.load('reprepro','main', shared_secret)
+
     node['reprepro'].keys.each do |key|
       next if key.to_sym == :pgp
       # NOTE: Use #has_key? so data bags can nil out existing values
